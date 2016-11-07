@@ -28,7 +28,7 @@ resp.
 Listen on ports *5001* and *5002* and output the active port to *tcp://localhost:9001* - switching
 inputs after 0.4 seconds of 'inactivity/activity'.
 
-`-i/--input` and `-o/--output` can both be specified multiple times.
+`-s/--source` and `-o/--output` can both be specified multiple times.
 
 The priority of the input ports is specified through the order. So in this example port *5001* is forwarded if
 available, else packages from the socket on *5002* are used.
