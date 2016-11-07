@@ -14,6 +14,10 @@ The aim of `odroute` is to achieve two goals:
 
     pip install -e .
 
+resp.
+
+   pip install -e git+https://github.com/digris/odr-stream-router.git#egg=odr-stream-router
+
 
 ## Usage
 
