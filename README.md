@@ -26,7 +26,7 @@ resp.
 #### Simple example:
 
 Listen on ports *5001* and *5002* and output the active port to *tcp://localhost:9001* - switching
-inputs after 0.4 seconds of 'inactivity/activity'.
+inputs after 0.5 seconds of 'inactivity/activity'.
 
 `-s/--source` and `-o/--output` can both be specified multiple times.
 
