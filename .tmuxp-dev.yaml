@@ -1,0 +1,19 @@
+session_name: odroute-dev
+start_directory: ./
+windows:
+
+- window_name: odroute-dev
+  layout: tiled
+  shell_command_before:
+    - 'source ./venv/bin/activate'
+  panes:
+    - shell_command:
+        - odroute run -s 7001 -s 7002 -o tcp://localhost:9999
+    - shell_command:
+        - ./dev-tools/zmq_rec.py -p 9999
+    - shell_command:
+        - ./dev-tools/zmq_send.py -o tcp://localhost:7001
+    - shell_command:
+        - ./dev-tools/zmq_send.py -o tcp://localhost:7002
+    - cd app
+    - cd app

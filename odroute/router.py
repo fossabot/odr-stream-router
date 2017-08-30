@@ -32,6 +32,9 @@ class StreamInput(object):
         return '<StreamInput: port {}>'.format(self.port)
 
     def bind(self):
+        """
+        bind zmq input port 
+        """
         logger.debug('Binding socket on port {} - failover delay: {}s'.format(
             self.port,
             self.failover_seconds,
@@ -53,6 +56,10 @@ class StreamInput(object):
         self._last_beat = time.time()
 
     def is_available(self):
+        """
+        check if the input instance is 'available':
+        "last time ticked less than failover duration"
+        """
         return self._last_beat > (time.time() - float(self.failover_seconds))
 
 
@@ -79,7 +86,9 @@ class StreamOutput(object):
         return c
 
     def send(self, frame):
-        # Just passing the zmq frame to the output's connection
+        """
+        passing the zmq frame to the output's connection
+        """
         self.connection.send(frame, zmq.NOBLOCK)
 
 
@@ -89,8 +98,10 @@ class StreamRouter(object):
     """
     _inputs = []
     _current_input = None
+    _forced_input = None
     _outputs = []
     _router = None
+    _telnet_server = None
 
     def __init__(self, source_ports, destinations, delay, **options):
 
@@ -124,11 +135,17 @@ class StreamRouter(object):
 
         current_input = None
 
+        # force input
+        if self._forced_input:
+            current_input = next(i for i in self._inputs if i.port == self._forced_input)
+
         # Loop through the inputs and return the first available one.
-        for i in self._inputs:
-            if i.is_available():
-                current_input = i
-                break
+        if not current_input:
+            current_input = next(i for i in self._inputs if i.is_available())
+            # for i in self._inputs:
+            #     if i.is_available():
+            #         current_input = i
+            #         break
 
         if (current_input and self._current_input) and (current_input != self._current_input):
             logger.info('Switching inputs: {} to {}'.format(
@@ -155,6 +172,12 @@ class StreamRouter(object):
 
         for i in self._inputs:
             i.stream.on_recv_stream(partial(self.route, input=i))
+
+        # self.telnet_server = TelnetServer(router=self)
+        # self.telnet_server.listen(4444)
+
+        if self._telnet_server:
+            self._telnet_server.start()
 
         # Start the tornado ioloop
         # http://pyzmq.readthedocs.io/en/latest/eventloop.html#futures-and-coroutines

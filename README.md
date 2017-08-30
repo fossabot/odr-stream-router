@@ -23,7 +23,7 @@ resp.
 
     odroute run --help
 
-#### Simple example:
+#### Simple Example
 
 Listen on ports *5001* and *5002* and output the active port to *tcp://localhost:9001* - switching
 inputs after 0.5 seconds of 'inactivity/activity'.
@@ -34,3 +34,28 @@ The priority of the input ports is specified through the order. So in this examp
 available, else packages from the socket on *5002* are used.
 
     odroute run -s 5001 -s 5002 -o tcp://localhost:9001 -d 0.5 -v debug
+
+#### Telnet Interface
+
+Version `0.0.2` provides a telnet interface that can list the configured inputs and outputs and the currently
+*active* input.  
+Further it provides functionality fo *force* an input to be used (instead of relying on the fallback 
+behaviour).
+
+
+use option `--telnet` resp. `-t` with either *port* to listen on or in *ip:port* to bind.  
+See `odroute run --help`
+
+    odroute run -s 5001 -s 5002 -o tcp://localhost:9001 -t 127.0.0.1:4001
+    
+Connect with telnet and run `help` to see the available commands
+
+    telnet 127.0.0.1 4001
+    
+Or use `netcat`:
+
+    echo help             | nc 127.0.0.1 4001
+    echo input.list       | nc 127.0.0.1 4001
+    echo input.force 5002 | nc 127.0.0.1 4001
+    echo input.current    | nc 127.0.0.1 4001
+
