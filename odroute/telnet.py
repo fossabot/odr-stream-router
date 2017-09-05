@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+import time
 from tornado import gen
 from tornado.iostream import StreamClosedError
 from tornado.tcpserver import TCPServer
@@ -75,11 +76,20 @@ class TelnetServer(TCPServer):
         returns router inputs
         """
         result = b''
-        for input in self.router._inputs:
-            if 'detail' in args:
-                result += b'{}\t{}\n'.format(input.port, input.is_available())
-            else:
+
+        if 'detail' in args:
+            result += b'port\tinput\tcurrent\tlast beat\n'
+            for input in self.router._inputs:
+                result += b'{port}\t  {input}\t   {current}\t  {last_beat:.2f}s\n'.format(
+                    port=input.port,
+                    input='*' if input.is_available() else '-',
+                    current='*' if self.router._current_input and self.router._current_input.port == input.port else '-',
+                    last_beat=time.time() - input._last_beat
+                )
+        else:
+            for input in self.router._inputs:
                 result += b'{}\n'.format(input.port)
+
         return result
 
     def cmd_output_list(self):

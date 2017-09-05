@@ -8,20 +8,18 @@ import click_log
 from router import StreamRouter
 from telnet import TelnetServer
 
-__version__ = '0.0.1'
+__version__ = '0.0.3'
 
 logger = logging.getLogger(__name__)
 
 
 @click.group()
-@click_log.simple_verbosity_option()
 @click_log.init(__name__)
 def cli():
     pass
 
 
 @cli.command()
-@click_log.simple_verbosity_option()
 @click.option('--source', '-s', 'sources', type=int, multiple=True, required=True,
               help='The source ports for incoming connections. Can (and likely will) be given multiple times')
 @click.option('--output', '-o', 'outputs', multiple=True, required=True,
