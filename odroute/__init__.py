@@ -3,18 +3,16 @@ import logging
 import sys
 
 import click
-import click_log
 
 from router import StreamRouter
 from telnet import TelnetServer
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 logger = logging.getLogger(__name__)
 
 
 @click.group()
-@click_log.init(__name__)
 def cli():
     pass
 
