@@ -14,11 +14,22 @@ The aim of `odroute` is to achieve two goals:
 
 ## Installation
 
+
+### Via PyPi
+
+    pip install odroute
+
+    
+### From GitHub
+
+    pip install -e git+https://github.com/digris/odr-stream-router.git#egg=odroute
+
+    
+### From Source
+
+    git clone https://github.com/digris/odr-stream-router.git
+    cd odr-stream-router
     pip install -e .
-
-resp.
-
-    pip install -e git+https://github.com/digris/odr-stream-router.git#egg=odr-stream-router
 
 
 ## Usage
