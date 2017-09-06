@@ -3,8 +3,12 @@ python:
 - '2.7'
 - '3.5'
 - '3.6'
-install: python setup.py
-script: py.test
+install:
+  - pip install .
+  - pip install pytest
+script:
+  - py.test
+  - odroute --help
 deploy:
   provider: pypi
   user: ohrstrom
