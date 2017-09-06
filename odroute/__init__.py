@@ -4,8 +4,8 @@ import sys
 
 import click
 
-from router import StreamRouter
-from telnet import TelnetServer
+from .router import StreamRouter
+from .telnet import TelnetServer
 
 __version__ = '0.0.6'
 
