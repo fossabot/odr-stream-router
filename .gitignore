@@ -10,5 +10,6 @@ build
 dist
 env
 venv
+venv3
 *egg-info
 *dev.cfg

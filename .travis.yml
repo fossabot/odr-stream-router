@@ -1,0 +1,16 @@
+language: python
+python:
+- '2.7'
+- '3.5'
+- '3.6'
+install: python setup
+script: py.test
+deploy:
+  provider: pypi
+  user: ohrstrom
+  password:
+    secure: Amc8vecu3
+  on:
+    tags: true
+    repo: digris/odr-stream-router
+    all_branches: true

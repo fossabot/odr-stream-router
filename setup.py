@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from setuptools import setup
+from setuptools import setup, find_packages
 
 INSTALL_REQUIREMENTS = [
     'Click>=6.0,<7.0',
@@ -12,9 +12,9 @@ setup(
     author_email='ohrstrom@gmail.com',
     url='https://github.com/digris/odr-stream-router',
     name='odroute',
-    version='0.0.5',
+    version='0.0.6',
     description='A primitive tool to route streams from ord-dabmod',
-    py_modules=['odroute'],
+    packages=find_packages(),
     install_requires=INSTALL_REQUIREMENTS,
     entry_points='''
         [console_scripts]
