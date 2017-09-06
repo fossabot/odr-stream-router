@@ -1,5 +1,7 @@
 # ODR Stream Router
 
+[![Build Status](https://travis-ci.org/digris/odr-stream-router.svg?branch=master)](https://travis-ci.org/digris/odr-stream-router)
+
 A fairly primitive tool to route ODR zmq streams.
 
 The aim of `odroute` is to achieve two goals:
