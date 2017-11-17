@@ -24,16 +24,18 @@ def cli():
               help='Destinations to route to, in the form of: tcp://<hostnam>:<port>. Can be given multiple times')
 @click.option('--delay', '-d', default=0.5,
               help='Delay until to fallback to secondary streams')
+@click.option('--audio-threshold', '-a', default=-90,
+              help='Minimum audio level (range [-90..0] dB) for input to be considered ok. Set to -90 to disable level detection')
 @click.option('--telnet', '-t', required=False,
               help='Add telnet interface: <bind addr>:<port> or <port> (if only port is given interface will bind to 127.0.0.1)')
-def run(sources, outputs, delay, telnet):
+def run(sources, outputs, delay, telnet, audio_threshold):
     logger.info('Source ports: %s' % ', '.join(map(str, sources)))
     logger.info('Destinations: %s' % ', '.join(outputs))
     logger.info('Telnet Interface: %s' % telnet)
 
     while True:
 
-        r = StreamRouter(sources, outputs, delay)
+        r = StreamRouter(sources, outputs, delay, audio_threshold)
 
         # adding telnet interface
         if telnet:

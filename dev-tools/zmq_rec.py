@@ -14,7 +14,7 @@ def rec(port):
 
     s = zmq_ctx.socket(zmq.SUB)
     s.bind('tcp://*:{port}'.format(port=port))
-    s.setsockopt(zmq.SUBSCRIBE, "")
+    s.setsockopt(zmq.SUBSCRIBE, b"")
 
 
     stream = ZMQStream(s)

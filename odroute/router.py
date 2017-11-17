@@ -9,6 +9,8 @@ import zmq
 from zmq.eventloop import ioloop
 from zmq.eventloop.zmqstream import ZMQStream
 
+from .frame import ZMQFrameDecoder
+
 logger = logging.getLogger(__name__)
 
 ioloop.install()
@@ -21,19 +23,24 @@ class StreamInput(object):
 
     connected = False
 
-    def __init__(self, zmq_ctx, port, failover_seconds):
+    def __init__(self, zmq_ctx, port, failover_seconds, audio_threshold):
+        """
+        audio_threshold is in range [-90..0] dB
+        """
         self.zmq_ctx = zmq_ctx
         self.port = port
         self.failover_seconds = failover_seconds
         self._last_beat = time.time() - float(failover_seconds)
         self.stream = self.bind()
+        self.frame_decoder = ZMQFrameDecoder()
+        self.audio_threshold = audio_threshold
 
     def __str__(self):
         return '<StreamInput: port {}>'.format(self.port)
 
     def bind(self):
         """
-        bind zmq input port 
+        bind zmq input port
         """
         logger.debug('Binding socket on port {} - failover delay: {}s'.format(
             self.port,
@@ -41,7 +48,7 @@ class StreamInput(object):
         ))
         s = self.zmq_ctx.socket(zmq.SUB)
         s.bind('tcp://*:{port}'.format(port=self.port))
-        s.setsockopt(zmq.SUBSCRIBE, "")
+        s.setsockopt(zmq.SUBSCRIBE, b"")
         self.connected = True
         return ZMQStream(s)
 
@@ -60,8 +67,18 @@ class StreamInput(object):
         check if the input instance is 'available':
         "last time ticked less than failover duration"
         """
-        return self._last_beat > (time.time() - float(self.failover_seconds))
+        has_recently_received_data = self._last_beat > (time.time() - float(self.failover_seconds))
 
+        if self.audio_threshold != -90:
+            audio_left, audio_right = self.frame_decoder.get_audio_levels()
+            has_valid_audio = (audio_left is not None) and \
+                              (audio_right is not None) and \
+                              (audio_left > self.audio_threshold) and \
+                              (audio_right > self.audio_threshold)
+
+            return has_recently_received_data and has_valid_audio
+        else:
+            return has_recently_received_data
 
 class StreamOutput(object):
     """
@@ -103,9 +120,9 @@ class StreamRouter(object):
     _router = None
     _telnet_server = None
 
-    def __init__(self, source_ports, destinations, delay, **options):
-
+    def __init__(self, source_ports, destinations, delay, audio_threshold, **options):
         self.failover_seconds = delay
+        self.audio_threshold = audio_threshold
         self.zmq_ctx = zmq.Context()
         self.source_ports = source_ports
         self.destinations = destinations
@@ -118,9 +135,8 @@ class StreamRouter(object):
         self.connect_outputs()
 
     def bind_inputs(self):
-
         for port in self.source_ports:
-            i = StreamInput(self.zmq_ctx, port, self.failover_seconds)
+            i = StreamInput(self.zmq_ctx, port, self.failover_seconds, self.audio_threshold)
             logger.info('Created socket on port {}'.format(port))
             self._inputs.append(i)
 
@@ -137,15 +153,18 @@ class StreamRouter(object):
 
         # force input
         if self._forced_input:
-            current_input = next(i for i in self._inputs if i.port == self._forced_input)
+            filtered_inputs = [i for i in self._inputs if i.port == self._forced_input]
+            if filtered_inputs:
+                current_input = filtered_inputs[0]
 
         # Loop through the inputs and return the first available one.
         if not current_input:
-            current_input = next(i for i in self._inputs if i.is_available())
-            # for i in self._inputs:
-            #     if i.is_available():
-            #         current_input = i
-            #         break
+            available_inputs = [i for i in self._inputs if i.is_available()]
+            if available_inputs:
+                current_input = available_inputs[0]
+            else:
+                pass
+                # TODO Raise alarm, no inputs available!
 
         if (current_input and self._current_input) and (current_input != self._current_input):
             logger.info('Switching inputs: {} to {}'.format(
@@ -161,6 +180,8 @@ class StreamRouter(object):
 
         # Trigger a 'heartbeat' tick on the input.
         input.tick()
+
+        input.frame_decoder.load_frame(msg[0])
 
         self.set_current_input()
 
