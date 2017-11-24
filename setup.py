@@ -13,7 +13,7 @@ setup(
     author_email='ohrstrom@gmail.com',
     url='https://github.com/digris/odr-stream-router',
     name='odroute',
-    version='0.0.14',
+    version='0.0.15',
     description='A primitive tool to route streams from odr-dabmod',
     packages=find_packages(),
     install_requires=INSTALL_REQUIREMENTS,
