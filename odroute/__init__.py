@@ -8,7 +8,7 @@ import click_log
 from .router import StreamRouter
 from .telnet import TelnetServer
 
-__version__ = '0.0.15'
+__version__ = '0.0.16'
 
 logger = logging.getLogger(__name__)
 
