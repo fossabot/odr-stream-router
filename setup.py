@@ -14,7 +14,7 @@ setup(
     url='https://github.com/digris/odr-stream-router',
     name='odroute',
     version='0.0.14',
-    description='A primitive tool to route streams from ord-dabmod',
+    description='A primitive tool to route streams from odr-dabmod',
     packages=find_packages(),
     install_requires=INSTALL_REQUIREMENTS,
     entry_points='''
