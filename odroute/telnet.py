@@ -24,6 +24,8 @@ COMMANDS = [
     'output.list',
 ]
 
+TELNET_PROMPT_PREFIX = b'> '
+
 
 class TelnetServer(TCPServer):
     def __init__(self, router):
@@ -38,12 +40,12 @@ class TelnetServer(TCPServer):
         handle telnet connection
         http://www.tornadoweb.org/en/stable/gen.html#tornado-gen-simplify-asynchronous-code
         """
-        stream.write('> ')
+        stream.write(TELNET_PROMPT_PREFIX)
         while True:
             try:
                 command = yield stream.read_until(b'\n')
                 result = self.handle_command(command.decode().strip())
-                yield stream.write(result.encode() + b'> ')
+                yield stream.write(result.encode() + TELNET_PROMPT_PREFIX)
             except StreamClosedError:
                 break
 
