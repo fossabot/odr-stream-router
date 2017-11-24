@@ -53,12 +53,13 @@ class ZMQFrameDecoder(object):
         else:
             int16_max = 0x7FFF
             if self.audiolevel_left:
-                dB_l = int(20*math.log10(self.audiolevel_left / int16_max))
+                print(self.audiolevel_left)
+                dB_l = int(20*math.log10(float(self.audiolevel_left) / int16_max))
             else:
                 dB_l = -90
 
             if self.audiolevel_right:
-                dB_r = int(20*math.log10(self.audiolevel_right / int16_max))
+                dB_r = int(20*math.log10(float(self.audiolevel_right) / int16_max))
             else:
                 dB_r = -90
 
