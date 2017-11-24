@@ -30,7 +30,11 @@ class StreamInput(object):
         self.zmq_ctx = zmq_ctx
         self.port = port
         self.failover_seconds = failover_seconds
-        self._last_beat = time.time() - float(failover_seconds)
+
+        time_now = time.time()
+        self._last_beat = time_now - float(failover_seconds)
+        self._last_audio_ok = time_now - float(failover_seconds)
+
         self.stream = self.bind()
         self.frame_decoder = ZMQFrameDecoder()
         self.audio_threshold = audio_threshold
@@ -58,27 +62,36 @@ class StreamInput(object):
         self.stream.close()
         self.connected = False
 
-    def tick(self):
+    def tick(self, msg):
         # triggered on every `on_recv` - used to track input availability.
-        self._last_beat = time.time()
+        time_now = time.time()
+        self._last_beat = time_now
 
-    def is_available(self):
-        """
-        check if the input instance is 'available':
-        "last time ticked less than failover duration"
-        """
-        has_recently_received_data = self._last_beat > (time.time() - float(self.failover_seconds))
-
+        # always load frame so that the audio levels are visible in the
+        # telnet interface
+        self.frame_decoder.load_frame(msg)
         if self.audio_threshold != -90:
             audio_left, audio_right = self.frame_decoder.get_audio_levels()
             has_valid_audio = (audio_left is not None) and \
                               (audio_right is not None) and \
                               (audio_left > self.audio_threshold) and \
                               (audio_right > self.audio_threshold)
-
-            return has_recently_received_data and has_valid_audio
+            if has_valid_audio:
+                self._last_audio_ok = time_now
         else:
-            return has_recently_received_data
+            # Assume audio is always ok
+            self._last_audio_ok = time_now
+
+    def is_available(self):
+        """
+        check if the input instance is 'available':
+        "last time ticked less than failover duration"
+        """
+        time_now = time.time()
+        has_recently_received_data = self._last_beat > (time_now - float(self.failover_seconds))
+        has_valid_audio = self._last_audio_ok > (time_now - float(self.failover_seconds))
+
+        return has_recently_received_data and has_valid_audio
 
 class StreamOutput(object):
     """
@@ -179,9 +192,7 @@ class StreamRouter(object):
         """
 
         # Trigger a 'heartbeat' tick on the input.
-        input.tick()
-
-        input.frame_decoder.load_frame(msg[0])
+        input.tick(msg[0])
 
         self.set_current_input()
 

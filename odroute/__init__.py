@@ -3,6 +3,7 @@ import logging
 import sys
 
 import click
+import click_log
 
 from .router import StreamRouter
 from .telnet import TelnetServer
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
+@click_log.init(__name__)
 def cli():
     pass
 

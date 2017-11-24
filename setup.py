@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 INSTALL_REQUIREMENTS = [
     'Click>=6.0,<7.0',
     'pyzmq>=16.0,<17.0',
+    'click_log>=0.1.4,<=0.1.8',
     'tornado>=4.0,<5.0',
 ]
 

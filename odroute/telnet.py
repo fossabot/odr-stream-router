@@ -79,14 +79,16 @@ class TelnetServer(TCPServer):
         result = ''
 
         if 'detail' in args:
-            tmpl = "{port:7}{input:>6}{current:>8}{lastbeat:10.2}{audio_left:>8}{audio_right:>8}\n"
-            result += tmpl.format(
+            tmpl_h = "{port:7}{input:>6}{current:>8} {lastbeat:>10}{audio_left:>8}{audio_right:>8} {lastaudio:>10}\n"
+            tmpl   = "{port:7}{input:>6}{current:>8} {lastbeat:10.2f}{audio_left:>8}{audio_right:>8} {lastaudio:>10.2f}\n"
+            result += tmpl_h.format(
                     port="port",
                     input="input",
                     current="current",
-                    lastbeat=" b",
+                    lastbeat="last beat",
                     audio_left="audio l",
-                    audio_right="audio r")
+                    audio_right="audio r",
+                    lastaudio="last audio")
             for input in self.router._inputs:
                 audio_left, audio_right = input.frame_decoder.get_audio_levels()
                 result += tmpl.format(
@@ -95,7 +97,8 @@ class TelnetServer(TCPServer):
                     current='*' if self.router._current_input and self.router._current_input.port == input.port else '-',
                     lastbeat=time.time() - input._last_beat,
                     audio_left=audio_left if audio_left is not None else "?",
-                    audio_right=audio_right if audio_right is not None else "?"
+                    audio_right=audio_right if audio_right is not None else "?",
+                    lastaudio=time.time() - input._last_audio_ok
                 )
         else:
             for input in self.router._inputs:
