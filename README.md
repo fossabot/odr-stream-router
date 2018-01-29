@@ -1,6 +1,7 @@
 # ODR Stream Router
 
 [![Build Status](https://travis-ci.org/digris/odr-stream-router.svg?branch=master)](https://travis-ci.org/digris/odr-stream-router)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdigris%2Fodr-stream-router.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdigris%2Fodr-stream-router?ref=badge_shield)
 
 A fairly primitive tool to route ODR zmq streams.
 
@@ -72,3 +73,7 @@ Or use `netcat`:
     echo input.force 5002 | nc 127.0.0.1 4001
     echo input.current    | nc 127.0.0.1 4001
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fdigris%2Fodr-stream-router.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fdigris%2Fodr-stream-router?ref=badge_large)
